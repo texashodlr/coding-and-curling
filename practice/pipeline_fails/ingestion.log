@@ -1,0 +1,14 @@
+INFO:root:Read 100000 rows from data.csv
+INFO:root:Read 100000 rows from data.csv
+INFO:root:Detected encoding: UTF-8-SIG
+INFO:root:Detected encoding: UTF-8-SIG
+INFO:root:Parsed 100000 rows with columns: ['dealer_id', 'plant_id', 'brand_name', 'model_id', 'vin', 'data_collection_status', 'vin_last_8', 'prefix', 'model_name', 'model_year', 'build_date', 'sold_date', 'plant_name', 'dealer_name', 'dealer_country']
+INFO:root:Parsed 100000 rows with columns: ['dealer_id', 'plant_id', 'brand_name', 'model_id', 'vin', 'data_collection_status', 'vin_last_8', 'prefix', 'model_name', 'model_year', 'build_date', 'sold_date', 'plant_name', 'dealer_name', 'dealer_country']
+INFO:root:Parsed 100000 rows with columns: ['dealer_id', 'plant_id', 'brand_name', 'model_id', 'vin', 'data_collection_status', 'vin_last_8', 'prefix', 'model_name', 'model_year', 'build_date', 'sold_date', 'plant_name', 'dealer_name', 'dealer_country']
+INFO:root:Parsed 100000 rows with columns: ['dealer_id', 'plant_id', 'brand_name', 'model_id', 'vin', 'data_collection_status', 'vin_last_8', 'prefix', 'model_name', 'model_year', 'build_date', 'sold_date', 'plant_name', 'dealer_name', 'dealer_country']
+INFO:root:Parsed 100000 rows with columns: ['dealer_id', 'plant_id', 'brand_name', 'model_id', 'vin', 'data_collection_status', 'vin_last_8', 'prefix', 'model_name', 'model_year', 'build_date', 'sold_date', 'plant_name', 'dealer_name', 'dealer_country']
+INFO:root:Missing dates after parsing: 99902
+ERROR:root:Schema mismatch - Missing: {'grapes', 'peach', 'pineapple', 'apple', 'banana'}, Extra: {'plant_id', 'model_year', 'brand_name', 'dealer_id', 'vin_last_8', 'model_name', 'dealer_country', 'vin', 'dealer_name', 'model_id', 'sold_date', 'data_collection_status', 'build_date', 'plant_name', 'prefix'}
+INFO:root:Extracted 100000 rows, columns: ['dealer_id', 'plant_id', 'brand_name', 'model_id', 'vin', 'data_collection_status', 'vin_last_8', 'prefix', 'model_name', 'model_year', 'build_date', 'sold_date', 'plant_name', 'dealer_name', 'dealer_country']
+INFO:root:Transformed data, missing dates: 99902
+INFO:root:Loaded data to processed_data.parquet
