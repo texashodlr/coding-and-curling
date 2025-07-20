@@ -1,0 +1,11 @@
+Filename: mem_profile.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+     6    131.7 MiB    131.7 MiB           1   @profile
+     7                                         def load_data(file_path):
+     8    171.8 MiB     40.1 MiB           1       df = pd.read_csv(file_path)
+     9    171.8 MiB      0.0 MiB           1       logging.info(f"Loaded {len(df)} rows, memory usage: {df.memory_usage(deep=True).sum() / 1e6:.2f} MB")
+    10    171.8 MiB      0.0 MiB           1       return df
+
+
