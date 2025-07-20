@@ -1,0 +1,5 @@
+ERROR:root:API Call failed: 404 Client Error: Not Found for url: https://api.openai.com/v1/completions
+ERROR:root:API Call failed: 400 Client Error: Bad Request for url: https://api.openai.com/v1/responses
+ERROR:root:API Call failed: 400 Client Error: Bad Request for url: https://api.openai.com/v1/responses
+ERROR:root:API Call failed: 429 Client Error: Too Many Requests for url: https://api.openai.com/v1/chat/completions
+ERROR:root:API error: 429 Client Error: Too Many Requests for url: https://api.openai.com/v1/chat/completions
