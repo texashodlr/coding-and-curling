@@ -1,0 +1,5 @@
+*.pth
+*.log
+*.txt
+/pytorch/data
+*.o
