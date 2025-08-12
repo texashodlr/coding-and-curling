@@ -68,4 +68,14 @@ Looking to ours we've got projected 137GFLOPs --> 100*(0.137/15.6)=.00878205s
                                     Net net --> Compute is ~10x Memory xfer
                                     So we're compute bound!
 
+Looking to the thread mapping we'll have a block which consists of 32x32 threads (256)
+threadIds will be ([:32],[:32]) thread A (0,0) and thread B (0,1)..
+    Will load the same col of B but differnt rows of A. We'll have continuous accesses
+    across A (row) but non-continuous across B
+
+Thus we only hit our peak of ~156-162GFLOPs largely because of these non-continuous memory accesses
+    so we need to at least look at how to adjust our memory accesses such that its coalesced
+    cutting down on time spent waiting for dorked up memory!
+    (Kernel 2)
+
 */
