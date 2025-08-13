@@ -126,6 +126,7 @@ int main(int argc, char **argv) {
           print_matrix(C_ref, m, n, fs);
         }
         exit(EXIT_FAILURE);
+        //printf(" EXIT_FAILURE PLACEHOLDER\n");
       }
     }
 

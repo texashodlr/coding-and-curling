@@ -147,6 +147,17 @@ void run_sgemm_coalesce(int M, int N, int K, float alpha, float *A, float *B,
       <<<gridDim, blockDim>>>(M, N, K, alpha, A, B, beta, C);
 }
 
+void run_sgemm_coalesce_varied(int M, int N, int K, float alpha, float *A, float *B,
+                        float beta, float *C) {
+  for(int DIM = 2; DIM < 64; DIM = DIM*2){
+    dim3 gridDim(div_ceil(M, 32), div_ceil(N, 32));
+    dim3 blockDim(DIM * DIM);
+    //printf("### Executing GMEM Coal with DIM: %d ###\n ",DIM);
+    sgemm_global_mem_coalesce_varied<<<gridDim, blockDim>>>(DIM, M, N, K, alpha, A, B, beta, C);
+  }
+  
+}
+
 void run_kernel(int kernel_num, int M, int N, int K, float alpha, float *A,
                 float *B, float beta, float *C, cublasHandle_t handle) {
   switch (kernel_num) {
@@ -159,7 +170,15 @@ void run_kernel(int kernel_num, int M, int N, int K, float alpha, float *A,
   case 2:
     run_sgemm_coalesce(M, N, K, alpha, A, B, beta, C);
     break;
+  case 3:
+    run_sgemm_coalesce_varied(M, N, K, alpha, A, B, beta, C);
+    break;
   default:
     throw std::invalid_argument("Unknown kernel number");
   }
 }
+/*
+
+nvcc -std=c++17 -arch=sm_89   main.cu run_kernels.cu  -lcublas -o gemm_bench
+
+*/
