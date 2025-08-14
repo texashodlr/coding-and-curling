@@ -1,6 +1,7 @@
 #include "ker_1_naive.cuh"
 #include "ker_2_gmem_coal.cuh"
 #include "ker_3_shmem_cache_blocking.cuh"
+#include "ker_4_shmem_multiple.cuh"
 #include "run_kernels.cuh"
 #include <cmath>
 #include <cstdio>
@@ -173,6 +174,18 @@ void run_sgemm_shared_mem_block(int M, int N, int K, float alpha, float *A,
       <<<gridDim, blockDim>>>(M, N, K, alpha, A, B, beta, C);
 }
 
+void runSgemm1DBlocktiling(int M, int N, int K, float alpha, float *A, float *B,
+                           float beta, float *C) {
+  const uint BM = 64;
+  const uint BN = 64;
+  const uint BK = 8;
+  const uint TM = 8;
+  dim3 gridDim(CEIL_DIV(N, BN), CEIL_DIV(M, BM));
+  dim3 blockDim((BM * BN) / TM);
+  sgemm1DBlocktiling<BM, BN, BK, TM>
+      <<<gridDim, blockDim>>>(M, N, K, alpha, A, B, beta, C);
+}
+
 void run_kernel(int kernel_num, int M, int N, int K, float alpha, float *A,
                 float *B, float beta, float *C, cublasHandle_t handle) {
   switch (kernel_num) {
@@ -190,6 +203,9 @@ void run_kernel(int kernel_num, int M, int N, int K, float alpha, float *A,
     break;
   case 4:
     run_sgemm_shared_mem_block(M, N, K, alpha, A, B, beta, C);
+    break;
+  case 5:
+    runSgemm1DBlocktiling(M, N, K, alpha, A, B, beta, C);
     break;
   default:
     throw std::invalid_argument("Unknown kernel number");
