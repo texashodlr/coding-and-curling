@@ -84,4 +84,47 @@ This kernel differs from #3 in that it adds a new inner loop for calculating mul
 Now using a SMEM cache size of BM*BK + BN*BK = 64*8 + 64*8 = 1024 floats for
     a total of 4KB per block.
 
+So in our paradigm of matrices: 
+    1. A = MxK
+    2. B = KxN
+    3. C = MxN
+    SMEM Cache is loaded with BMxBK and BNxBK which calculates: BMxBN
+
+    Each thread calculates a column of results v. a single result as in Ker 3.
+    Previously memory accesses looked like:
+        GMEM: k/32 iterations of the outer loop * 2 loads
+        SHMEM: k/32 iterations of outer loop * BLOCKSIZE (=32) * 2 loads
+        Memory accesses per result: K/16 GMEM, K*2 SMEM
+            --> 4096/16, 4096*2: 256+8192
+    
+    New Kernel: 
+        GMEM: k/8 iterations of outerloop * 2 Loads
+        SHMEM: K/8 iterations of the outer loop * BK(=8)*(1+TM(=8))
+        Memory accesses per result: K/32 GMEM, K*9/8 SMEM
+            --> 4096/32, 4096*9/8 = 128 + 4608
+
+    So with the new kernel, 4736 loads v 8448 loads
+
+    In terms of compiler optimizations if don't cache tmp results of B in Btmp
+    then we instead end up with this:
+    for(uint resIdx = 0; resIdx < TM; ++resIdx){
+        for(uint dotIdx = 0; dotIdx < BK; ++dotIdx){
+            threadResults[resIdx] +=
+                As[(threadRow * TM + resIdx) * BK + dotIdx] * Bs[dotIdx * BN + threadCol];
+        }
+    }
+
+    The above has /no adverse/ effect on performance because the compiler unrolls
+        both loops and then eliminates the repeated SMEM loads of the Bs entries thus
+        we end up with the same amount of SMEM accesses as our optimized CUDA code.
+
+        When the PTX is compiled to SASS the SMEM loads from Bs are vectorized!
+
+    The actual optimization here is just doing more math per thread, from 1 result/thr to 4/thr
+    1 result needs 7 loads from A and B and 1 load&store to C (15L,1S)
+
+    4 results needs 14 loads from A (2 rows) 14 loads from B (2 rows)
+        and 4 loads and 4 stores to C
+        so per result (4) we've got 8 loads and 1 store
+    For the immediate future we'll optimize arithmetic intensity while still being memory bound.
 */
