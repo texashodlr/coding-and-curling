@@ -2,6 +2,7 @@
 #include "ker_2_gmem_coal.cuh"
 #include "ker_3_shmem_cache_blocking.cuh"
 #include "ker_4_shmem_multiple.cuh"
+#include "ker_5_2d_blocktiling.cuh"
 #include "run_kernels.cuh"
 #include <cmath>
 #include <cstdio>
@@ -186,6 +187,30 @@ void runSgemm1DBlocktiling(int M, int N, int K, float alpha, float *A, float *B,
       <<<gridDim, blockDim>>>(M, N, K, alpha, A, B, beta, C);
 }
 
+void runSgemm2DBlocktiling(int M, int N, int K, float alpha, float *A, float *B,
+                           float beta, float *C) {
+  const uint BK = 8;
+  const uint TM = 8;
+  const uint TN = 8;
+  if (M >= 128 and N >= 128) {
+    const uint BM = 128;
+    const uint BN = 128;
+    dim3 gridDim(CEIL_DIV(N, BN), CEIL_DIV(M, BM));
+    dim3 blockDim((BM * BN) / (TM * TN));
+    sgemm2DBlocktiling<BM, BN, BK, TM, TN>
+        <<<gridDim, blockDim>>>(M, N, K, alpha, A, B, beta, C);
+  } else {
+    // this is a hacky solution to the underlying problem
+    // of not having proper bounds checking in the kernel
+    const uint BM = 64;
+    const uint BN = 64;
+    dim3 gridDim(CEIL_DIV(N, BN), CEIL_DIV(M, BM));
+    dim3 blockDim((BM * BN) / (TM * TN));
+    sgemm2DBlocktiling<BM, BN, BK, TM, TN>
+        <<<gridDim, blockDim>>>(M, N, K, alpha, A, B, beta, C);
+  }
+}
+
 void run_kernel(int kernel_num, int M, int N, int K, float alpha, float *A,
                 float *B, float beta, float *C, cublasHandle_t handle) {
   switch (kernel_num) {
@@ -206,6 +231,9 @@ void run_kernel(int kernel_num, int M, int N, int K, float alpha, float *A,
     break;
   case 5:
     runSgemm1DBlocktiling(M, N, K, alpha, A, B, beta, C);
+    break;
+  case 6:
+    runSgemm2DBlocktiling(M, N, K, alpha, A, B, beta, C);
     break;
   default:
     throw std::invalid_argument("Unknown kernel number");
